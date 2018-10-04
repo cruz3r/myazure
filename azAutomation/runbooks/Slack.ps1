@@ -353,6 +353,7 @@ if ($SlackParams.Text -eq 'testuser') {
 
     }
     catch{
+    	$Error[0].Exception.message
         "Failed to say hello"
     }
 
