@@ -209,12 +209,13 @@ if ($SlackParams.Text -like 'newarmgroup*') {
 }
 
 ### This is a catch-all. If the Runbook command isn't found, then an error will be sent to the Slack channel
-Send-SlackMessage -Message ('No Slack command found in Azure Automation Runbook: {0}' -f $SlackParams.Text.Split(' ')[0]);
 Try{
-($WebhookData  | ConvertFrom-Json).requestbody -match "^.+user_id=(?<userID>\w+).+user_name=(?<userName>\w+)"
-$UserName = $matches.userName
-$UserID = $matches.userID
-Send-SlackMessage -Message ("Hello $UserName : {0}" -f $SlackParams.Text.Split(' ')[0]);
+$UserName = $SlackParams.user_name
+$UserID = $SlackParams.user_id
+Send-SlackMessage -Message ($UserName)
 }catch{
+	$matches
 	"Failed to say hello"
 }
+
+Send-SlackMessage -Message ('No Slack command found in Azure Automation Runbook: {0}' -f $SlackParams.Text.Split(' ')[0]);
