@@ -328,20 +328,19 @@ if ($SlackParams.Text -eq 'listarmgroups') {
 if ($SlackParams.Text -eq 'testuser') {
 
     try{
+        $null = Add-AzureRmAccount -Credential (Get-AutomationPSCredential -Name AzureAdmin) -SubscriptionName "Visual Studio Premium with MSDN";
+        $UserName = $SlackParams.user_name
 
-    $UserName = $SlackParams.user_name
+        $UserID = $SlackParams.user_id
+        $secGroup = Get-AutomationVariable -Name secGroup
+        write-verbose $secGroup
+        write-output $secGroup
+        $SlackToken = Get-AutomationVariable -Name SlackToken
 
-    $UserID = $SlackParams.user_id
-    $secGroup = Get-AutomationVariable -Name secGroup
-    write-verbose $secGroup
-    write-output $secGroup
-    $SlackToken = Get-AutomationVariable -Name SlackToken
+        $url = ("https://slack.com/api/users.info?token=$SlackToken&user=$UserID&pretty=1")
 
-    $url = ("https://slack.com/api/users.info?token=$SlackToken&user=$UserID&pretty=1")
-
-    $email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
-    write-output $email
-
+        $email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
+        write-output $email
 
         if ((Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember).userprincipalname -contains $email){
             "YAY Continue"
@@ -353,7 +352,7 @@ if ($SlackParams.Text -eq 'testuser') {
 
     }
     catch{
-    	$Error[0].Exception.message
+        $Error[0].Exception.message
         "Failed to say hello"
     }
 
