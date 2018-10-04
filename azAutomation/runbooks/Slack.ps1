@@ -214,7 +214,7 @@ Try{
 ($WebhookData  | ConvertFrom-Json).requestbody -match "^.+user_id=(?<userID>\w+).+user_name=(?<userName>\w+)"
 $UserName = $matches.userName
 $UserID = $matches.userID
-Send-SlackMessage -Message "Hello $UserName"
+Send-SlackMessage -Message ("Hello $UserName: {0}" -f $SlackParams.Text.Split(' ')[0]);
 }catch{
 	"Failed to say hello"
 }
