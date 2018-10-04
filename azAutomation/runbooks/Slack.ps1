@@ -341,9 +341,10 @@ if ($SlackParams.Text -eq 'testuser') {
 
         $email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
         write-output $email
-
-        if ((Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember).userprincipalname -contains $email){
-            "YAY Continue"
+	
+	(Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember)
+        if ((Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember).userPrincipalName -contains $email){
+	    "YAY Continue"
             Send-SlackMessage -Message ($UserName)
             Send-SlackMessage -Message ($email)
         }else{
