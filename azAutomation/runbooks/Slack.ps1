@@ -139,9 +139,8 @@ $secGroup = secGroup
 $secGroup
 $SlackToken = SlackToken
 
-$url = "https://slack.com/api/users.info?token=" + $SlackToken + "&user=" + $UserID + "&pretty=1"
+$url = ("https://slack.com/api/users.info?token=" + $SlackToken + "&user=" + $UserID + "&pretty=1")
 $email = ((invoke-webrequest $url).content | ConvertFrom-Json).user.profile | select -ExpandProperty email
-Send-SlackMessage -Message ($UserName)
 Send-SlackMessage -Message ($UserName)
 if ((Get-AzureRmADGroup -DisplayNameStartsWith $secGroup  | Get-AzureRmADGroupMember).userprincipalname -contains $email){
     "YAY Continue"
