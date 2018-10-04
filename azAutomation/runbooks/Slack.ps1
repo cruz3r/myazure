@@ -130,27 +130,30 @@ if ($SlackParams.Text -like 'newarmgroup*') {
 ### This is a catch-all. If the Runbook command isn't found, then an error will be sent to the Slack channel
 if ($SlackParams.Text -like 'testuser*') {
 
-Try{
+    try{
 
-$UserName = $SlackParams.user_name
+    $UserName = $SlackParams.user_name
+    $UserID = $SlackParams.user_id
+    $secGroup = secGroup
+    $secGroup
+    $SlackToken = SlackToken
 
-$UserID = $SlackParams.user_id
-$secGroup = secGroup
-$secGroup
-$SlackToken = SlackToken
+    $url = ("https://slack.com/api/users.info?token=" + $SlackToken + "&user=" + $UserID + "&pretty=1")
 
-$url = ("https://slack.com/api/users.info?token=" + $SlackToken + "&user=" + $UserID + "&pretty=1")
-$email = ((invoke-webrequest $url).content | ConvertFrom-Json).user.profile | select -ExpandProperty email
-Send-SlackMessage -Message ($UserName)
-if ((Get-AzureRmADGroup -DisplayNameStartsWith $secGroup  | Get-AzureRmADGroupMember).userprincipalname -contains $email){
-    "YAY Continue"
-    Send-SlackMessage -Message ($email)
-}else{
-    "Boo your not in the group"
-}
+    $email = (((invoke-webrequest $url).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
 
-}catch{
-	"Failed to say hello"
+    Send-SlackMessage -Message ($UserName)
+        if ((Get-AzureRmADGroup -DisplayNameStartsWith $secGroup  | Get-AzureRmADGroupMember).userprincipalname -contains $email){
+            "YAY Continue"
+            Send-SlackMessage -Message ($email)
+        }else{
+            "Boo your not in the group"
+        }
+
+    }
+    catch{
+        "Failed to say hello"
+    }
 }
 
 Send-SlackMessage -Message ('No Slack command found in Azure Automation Runbook: {0}' -f $SlackParams.Text.Split(' ')[0]);
