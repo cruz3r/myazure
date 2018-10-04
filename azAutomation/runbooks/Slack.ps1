@@ -343,7 +343,7 @@ if ($SlackParams.Text -eq 'testuser') {
     write-output $email
 
 
-        if ((Get-AzureRmADGroup -DisplayNameStartsWith $secGroup  | Get-AzureRmADGroupMember).userprincipalname -contains $email){
+        if ((Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember).userprincipalname -contains $email){
             "YAY Continue"
             Send-SlackMessage -Message ($UserName)
             Send-SlackMessage -Message ($email)
