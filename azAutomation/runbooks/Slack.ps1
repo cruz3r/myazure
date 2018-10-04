@@ -121,31 +121,18 @@ function Get-SlackParameter {
 ### Example result:
 
 <#
-
 Name                           Value
-
 ----                           -----
-
 team_id                        S1L63JMUI
-
 user_name                      trevor
-
 channel_id                     BOU20EN7T
-
 response_url                   https://hooks.slack.com/commands/S1L63JMUI/22387674759/Cw62aJBtn2E29IBkS1ZkFqiP
-
 command                        /runbook
-
 text                           list
-
 user_id                        U0L26M71V
-
 team_domain                    artofshell
-
 token                          baMLUbHjU32psaPGvQm2sF4j
-
 channel_name                   general
-
 #>
 
 $SlackParams = Get-SlackParameter -WebhookPayload $WebhookData.RequestBody;
@@ -154,7 +141,7 @@ $SlackParams = Get-SlackParameter -WebhookPayload $WebhookData.RequestBody;
 
 ### For testing, output the list of Slack parameters. Normally not needed for production Runbooks.
 
-#Write-Output -InputObject $SlackParams;
+Write-Output -InputObject $SlackParams;
 
 Write-Verbose -Message $SlackParams;
 
@@ -327,6 +314,16 @@ if ($SlackParams.Text -eq 'listarmgroups') {
 	return;
 
 }
+
+### Test User in security group for access
+
+### Test User in security group for access
+
+###
+
+###   Example Invocation (from Slack):
+
+###     /runbook testuser
 
 if ($SlackParams.Text -eq 'testuser') {
 
