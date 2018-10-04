@@ -420,16 +420,17 @@ if ($SlackParams.Text -like 'newarmgroup*') {
 
 ### This is a catch-all. If the Runbook command isn't found, then an error will be sent to the Slack channel
 
-if ($SlackParams.Text -like 'testuser*') {
+if ($SlackParams.Text -eq 'testuser') {
 
     try{
 
     $UserName = $SlackParams.user_name
 
     $UserID = $SlackParams.user_id
-    $secGroup = secGroup
-    $secGroup
-    $SlackToken = SlackToken
+    $secGroup = Get-AutomationVariable -Name secGroup
+    write-verbose $secGroup
+    write-output $secGroup
+    $SlackToken = Get-AutomationVariable -Name SlackToken
 
     $url = ("https://slack.com/api/users.info?token=" + $SlackToken + "&user=" + $UserID + "&pretty=1")
 
