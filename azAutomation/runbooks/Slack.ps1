@@ -1,84 +1,3 @@
-# Add to git test
-<#
-    .Author
-	Trevor Sullivan <trevor@trevorsullivan.net>
-	https://trevorsullivan.net
-	https://twitter.com/pcgeek86
-	
-	.Description
-	This Azure Automation Runbook serves as a template for bi-directionally integrating Microsoft Azure Automation
-	with the Slack chat service, through the use of Webhooks for Slack and Azure Automation. You can build your own
-	custom commands, similar to the ones that are defined towards the bottom of this Runbook. The Get-SlackParameter
-	and Send-SlackMessage funcions are provided as helpful plumbing.
-	
-	NOTE: You need to configure a "custom slash command" for your Slack organization, as well as an "incoming webhook"
-		  in order to take advantage of all of the features of this Azure Automation Runbook.
-#>
-param (
-	[Object] $WebhookData
-)
-
-### Build a function that accepts Slack parameters 
-function Get-SlackParameter {
-	<#
-	.Synopsis
-	This function takes the input parameters to a Webhook call by the Slack service. The function translates the query
-	string, provided by the Slack service, and returns a PowerShell HashTable of key-value pairs. Azure Automation accepts
-	a $WebhookData input parameter, for Webhook invocations, and you should pass the value of the RequestBody property
-	into this function's WebhookPayload parameter.
-	
-	.Parameter WebhookPayload
-	This parameter accepts the Azure Automation-specific $WebhookData.RequestBody content, which contains
-	input parameters from Slack. The function parses the query string, and returns a HashTable of key-value
-	pairs, that represents the input parameters from a Webhook invocation from Slack.
-	
-	eg. var1=value1&var2=value2&var3=value3 
-	#>
-	[CmdletBinding()]
-	param (
-		[Parameter(Mandatory = $true)]
-		[string] $WebhookPayload
-	)
-	
-	$ParamHT = @{ };
-	$Params = $WebhookPayload.Split('&');
-	
-	foreach ($Param in $Params) {
-		try {
-			$Param = $Param.Split('=');
-			$ParamHT.Add($Param[0], [System.Net.WebUtility]::UrlDecode($Param[1]))			
-		}
-		catch {
-			Write-Warning -Message ('Possible null parameter value for {0}' -f $Param[0]);
-		}
-	}
-	
-	Write-Output -InputObject $ParamHT;
-}
-
-### Invoke the retrieval of Slack parameters
-
-### Example result:
-<#
-Name                           Value                                                                                    
-----                           -----                                                                                    
-team_id                        S1L63JMUI                                                                                
-user_name                      trevor                                                                                   
-channel_id                     BOU20EN7T                                                                                
-response_url                   https://hooks.slack.com/commands/S1L63JMUI/22387674759/Cw62aJBtn2E29IBkS1ZkFqiP          
-command                        /runbook                                                                                 
-text                           list                                                                                         
-user_id                        U0L26M71V                                                                                
-team_domain                    artofshell
-token                          baMLUbHjU32psaPGvQm2sF4j                                                                 
-channel_name                   general
-#>
-$SlackParams = Get-SlackParameter -WebhookPayload $WebhookData.RequestBody;
-
-### For testing, output the list of Slack parameters. Normally not needed for production Runbooks.
-#Write-Output -InputObject $SlackParams;
-Write-Verbose -Message $SlackParams;
-
 function Send-SlackMessage {
 	<#
 	.Synopsis
@@ -209,12 +128,27 @@ if ($SlackParams.Text -like 'newarmgroup*') {
 }
 
 ### This is a catch-all. If the Runbook command isn't found, then an error will be sent to the Slack channel
+if ($SlackParams.Text -like 'testuser*') {
+
 Try{
+
 $UserName = $SlackParams.user_name
+
 $UserID = $SlackParams.user_id
+$secGroup = secGroup
+
+$url = "https://slack.com/api/users.info?token=xoxp-118496080977-182311508644-449631628295-e1e24c3224f661f60bc4ba24f8830608&user=$UserID&pretty=1"
+$email = ((invoke-webrequest $url).content | ConvertFrom-Json).user.profile | select -ExpandProperty email
 Send-SlackMessage -Message ($UserName)
+Send-SlackMessage -Message ($UserName)
+if ((Get-AzureRmADGroup -DisplayNameStartsWith $secGroup  | Get-AzureRmADGroupMember).userprincipalname -contains $email){
+    "YAY Continue"
+    Send-SlackMessage -Message ($email)
+}else{
+    "Boo your not in the group"
+}
+
 }catch{
-	$matches
 	"Failed to say hello"
 }
 
