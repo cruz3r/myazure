@@ -134,7 +134,7 @@ Try{
 
 $UserName = $SlackParams.user_name
 
-$$UserID = $SlackParams.user_id
+$UserID = $SlackParams.user_id
 $secGroup = secGroup
 $secGroup
 $SlackToken = SlackToken
