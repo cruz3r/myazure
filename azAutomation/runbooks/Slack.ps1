@@ -339,7 +339,7 @@ if ($SlackParams.Text -eq 'testuser') {
 
     $url = ("https://slack.com/api/users.info?token=$SlackToken&user=$UserID&pretty=1")
 
-    $email = (((invoke-webrequest $url).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
+    $email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
     write-output $email
 
 
