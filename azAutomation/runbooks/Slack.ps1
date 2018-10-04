@@ -134,10 +134,12 @@ Try{
 
 $UserName = $SlackParams.user_name
 
-$UserID = $SlackParams.user_id
+$$UserID = $SlackParams.user_id
 $secGroup = secGroup
+$secGroup
+$SlackToken = SlackToken
 
-$url = "https://slack.com/api/users.info?token=xoxp-118496080977-182311508644-449631628295-e1e24c3224f661f60bc4ba24f8830608&user=$UserID&pretty=1"
+$url = "https://slack.com/api/users.info?token=" + $SlackToken + "&user=" + $UserID + "&pretty=1"
 $email = ((invoke-webrequest $url).content | ConvertFrom-Json).user.profile | select -ExpandProperty email
 Send-SlackMessage -Message ($UserName)
 Send-SlackMessage -Message ($UserName)
