@@ -365,7 +365,7 @@ try{
         "YAY Continue"
         $Access = $true
 
-        Send-SlackMessage -Message ("Welcome $UserName")
+        Send-SlackMessage -Message ("Welcome $UserName `nGive me a second while I work on $($SlackParams.Text)")
 
     }else{
 
