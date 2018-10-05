@@ -348,7 +348,9 @@ if ($SlackParams.Text -eq 'testuser') {
             Send-SlackMessage -Message ($UserName)
             Send-SlackMessage -Message ($email)
         }else{
-            "Boo your not in the group"
+            Send-SlackMessage -Message "Your not in the group"
+            "Your not in the group"
+            (Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember).userPrincipalName | foreach { if ($_ -match "#"){($_ -split "#")[0] -replace "_","@" }else{$_}}
         }
 
     }
