@@ -498,7 +498,7 @@ if (($SlackParams.Text -like 'delarmgroup*') -and ($Access)) {
 	catch {
 
         throw ('Error occurred while deleting ARM Resource Group {0}: {1}' -f $ResourceGroupName, $PSItem.Exception.Message);
-        $err = ('Error occurred while deleting ARM Resource Group {0}: {1}' -f $ResourceGroupName, $PSItem.Exception.Message);
+        $err = ('Error occurred while deleting ARM Resource Group: ' + $($Error[0].Exception.message);
         New-SlackMessage -Message $err
 
 	}
@@ -549,7 +549,7 @@ if (($SlackParams.Text -like 'newarmgroup*') -and ($Access)) {
 
 	catch {
         throw ('Error occurred while creating ARM Resource Group {0}: {1}' -f $ResourceGroup.Name, $PSItem.Exception.Message);
-        $err =('Error occurred while creating ARM Resource Group {0}: {1}' -f $ResourceGroup.Name, $PSItem.Exception.Message);
+        $err =('Error occurred while creating ARM Resource Group: ' + $($Error[0].Exception.message);
         Send-SlackMessage -Message $err
 
 	}
