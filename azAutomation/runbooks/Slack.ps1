@@ -341,10 +341,10 @@ if ($SlackParams.Text -eq 'testuser') {
 
         $email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
         write-output $email
-	
-	(Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember)
-        if ((Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember).userPrincipalName -contains $email){
-	    "YAY Continue"
+        (Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember)
+        # This is looking for guest users in AzureAD if the Email has _ or # it will not work
+        if ((Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember).userPrincipalName | foreach { if ($_ -match "#"){($_ -split "#")[0] -replace "_","@" }else{$_}} -contains $email){
+            "YAY Continue"
             Send-SlackMessage -Message ($UserName)
             Send-SlackMessage -Message ($email)
         }else{
