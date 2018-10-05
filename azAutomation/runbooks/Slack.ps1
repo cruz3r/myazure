@@ -358,13 +358,14 @@ if ($SlackParams.Text -eq 'testuser') {
 
         write-output $email
 
-        write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup | select UserPrincipalName, SignInName)
+        write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup | Select-Object UserPrincipalName, SignInName)
+        write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup).SignInName
 
         # This is looking for guest users in AzureAD if the Email has _ or # it will not work
 
         $accounts = (Get-AzureRmADGroupMember -GroupObjectId $secGroup).userPrincipalName | ForEach-Object { if ($_ -match "#"){($_ -split "#")[0] -replace "_","@" }else{$_}}
 
-        Write-Output $accounts
+        # Write-Output $accounts
 
         if ($accounts -contains $email){
 
