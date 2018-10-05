@@ -552,7 +552,7 @@ if (($SlackParams.Text -like 'newarmgroup*') -and ($Access)) {
     	$err1 = $Error[0].Exception.message
         write-output "test $err1"
         $err = "Error occurred while creating ARM Resource Group: $err1";
-        Send-SlackMessage -Message $err
+        Send-SlackMessage -Message $err1
         throw ('Error occurred while creating ARM Resource Group {0}: {1}' -f $ResourceGroup.Name, $PSItem.Exception.Message);
 
 	}
