@@ -441,11 +441,14 @@ if ($SlackParams.Text -eq 'testuser') {
 
             "Your not in the group"
             $Access = $false
-            Send-SlackMessage -Message "$UserName does not have access"
+            Send-SlackMessage -Message "Your not in the group"
 
             # write-output $accounts
 
         }
+
+
+
     }
 
     catch{
@@ -494,7 +497,9 @@ if (($SlackParams.Text -like 'delarmgroup*') -and ($Access)) {
 
 	catch {
 
-		throw ('Error occurred while deleting ARM Resource Group {0}: {1}' -f $ResourceGroupName, $PSItem.Exception.Message);
+        throw ('Error occurred while deleting ARM Resource Group {0}: {1}' -f $ResourceGroupName, $PSItem.Exception.Message);
+        $err = ('Error occurred while deleting ARM Resource Group {0}: {1}' -f $ResourceGroupName, $PSItem.Exception.Message);
+        New-SlackMessage -Message $err
 
 	}
 
@@ -543,8 +548,9 @@ if (($SlackParams.Text -like 'newarmgroup*') -and ($Access)) {
 	}
 
 	catch {
-
-		throw ('Error occurred while creating ARM Resource Group {0}: {1}' -f $ResourceGroup.Name, $PSItem.Exception.Message);
+        throw ('Error occurred while creating ARM Resource Group {0}: {1}' -f $ResourceGroup.Name, $PSItem.Exception.Message);
+        $err =('Error occurred while creating ARM Resource Group {0}: {1}' -f $ResourceGroup.Name, $PSItem.Exception.Message);
+        Send-SlackMessage -Message $err
 
 	}
 
