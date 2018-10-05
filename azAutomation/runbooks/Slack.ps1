@@ -141,7 +141,7 @@ $SlackParams = Get-SlackParameter -WebhookPayload $WebhookData.RequestBody;
 
 ### For testing, output the list of Slack parameters. Normally not needed for production Runbooks.
 
-Write-Output -InputObject $SlackParams;
+# Write-Output -InputObject $SlackParams;
 
 Write-Verbose -Message $SlackParams;
 
@@ -336,8 +336,6 @@ if ($SlackParams.Text -eq 'testuser') {
 
         $UserName = $SlackParams.user_name
 
-
-
         $UserID = $SlackParams.user_id
 
         $secGroup = Get-AutomationVariable -Name AZAutomation
@@ -348,25 +346,21 @@ if ($SlackParams.Text -eq 'testuser') {
 
         $SlackToken = Get-AutomationVariable -Name SlackToken
 
+	$url = ("https://slack.com/api/users.info?token=$SlackToken&user=$UserID&pretty=1")
 
-
-        $url = ("https://slack.com/api/users.info?token=$SlackToken&user=$UserID&pretty=1")
-
-
-
-        $email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
+	$email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
 
         write-output $email
-
-        write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup | Select-Object UserPrincipalName, SignInName)
-        write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup).SignInName
+ 	
+	# write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup | Select-Object UserPrincipalName, SignInName)
+        # write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup).SignInName
 
         # This is looking for guest users in AzureAD if the Email has _ or # it will not work
 
-        $accounts = (Get-AzureRmADGroupMember -GroupObjectId $secGroup).userPrincipalName | ForEach-Object { if ($_ -match "#"){($_ -split "#")[0] -replace "_","@" }else{$_}}
-
-        # Write-Output $accounts
-
+        # $accounts = (Get-AzureRmADGroupMember -GroupObjectId $secGroup).userPrincipalName | ForEach-Object { if ($_ -match "#"){($_ -split "#")[0] -replace "_","@" }else{$_}}
+        $accounts = (Get-AzureRmADGroupMember -GroupObjectId $secGroup).SignInName
+        Write-Output $accounts
+        
         if ($accounts -contains $email){
 
             "YAY Continue"
