@@ -332,7 +332,7 @@ if ($SlackParams.Text -eq 'testuser') {
         $UserName = $SlackParams.user_name
 
         $UserID = $SlackParams.user_id
-        $secGroup = Get-AutomationVariable -Name secGroup
+        $secGroup = Get-AutomationVariable -Name AZAutomation
         write-verbose $secGroup
         write-output $secGroup
         $SlackToken = Get-AutomationVariable -Name SlackToken
@@ -341,7 +341,7 @@ if ($SlackParams.Text -eq 'testuser') {
 
         $email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
         write-output $email
-        (Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember)
+        Get-AzureRmADGroupMember -GroupObjectId
         # This is looking for guest users in AzureAD if the Email has _ or # it will not work
         $accounts = (Get-AzureRmADGroup -SearchString $secGroup  | Get-AzureRmADGroupMember).userPrincipalName | ForEach-Object { if ($_ -match "#"){($_ -split "#")[0] -replace "_","@" }else{$_}}
         if ($accounts -contains $email){
@@ -351,7 +351,7 @@ if ($SlackParams.Text -eq 'testuser') {
         }else{
             Send-SlackMessage -Message "Your not in the group"
             "Your not in the group"
-            $accounts
+            write-output $accounts
         }
 
     }
