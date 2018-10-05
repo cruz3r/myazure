@@ -325,6 +325,75 @@ if ($SlackParams.Text -eq 'listarmgroups') {
 
 ###     /runbook testuser
 
+<#
+
+#>
+#region Testing $Access
+try{
+
+    $null = Add-AzureRmAccount -Credential (Get-AutomationPSCredential -Name AzureAdmin) -SubscriptionName "Visual Studio Premium with MSDN";
+
+    $UserName = $SlackParams.user_name
+
+    $UserID = $SlackParams.user_id
+
+    $secGroup = Get-AutomationVariable -Name AZAutomation
+
+    write-verbose $secGroup
+
+    # write-output $secGroup
+
+    $SlackToken = Get-AutomationVariable -Name SlackToken
+
+    $url = ("https://slack.com/api/users.info?token=$SlackToken&user=$UserID&pretty=1")
+
+    $email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
+
+    write-output $email
+
+    # write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup | Select-Object UserPrincipalName, SignInName)
+    # write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup).SignInName
+
+    # This is looking for guest users in AzureAD if the Email has _ or # it will not work
+
+    # $accounts = (Get-AzureRmADGroupMember -GroupObjectId $secGroup).userPrincipalName | ForEach-Object { if ($_ -match "#"){($_ -split "#")[0] -replace "_","@" }else{$_}}
+    $accounts = (Get-AzureRmADGroupMember -GroupObjectId $secGroup).SignInName
+    # Write-Output $accounts
+
+    if ($accounts -contains $email){
+
+        "YAY Continue"
+        $Access = $true
+
+        Send-SlackMessage -Message ("Welcome $UserName")
+
+    }else{
+
+        "Your not in the group"
+        $Access = $false
+        Send-SlackMessage -Message "Your not in the group"
+
+        # write-output $accounts
+
+    }
+
+
+
+}
+
+catch{
+
+    $err = $Error[0].Exception.message
+
+    write-output $err
+
+    "Failed to say hello"
+
+    Send-SlackMessage -Message $err
+
+}
+
+#endregion
 
 if ($SlackParams.Text -eq 'testuser') {
 
@@ -346,36 +415,35 @@ if ($SlackParams.Text -eq 'testuser') {
 
         $SlackToken = Get-AutomationVariable -Name SlackToken
 
-	$url = ("https://slack.com/api/users.info?token=$SlackToken&user=$UserID&pretty=1")
+        $url = ("https://slack.com/api/users.info?token=$SlackToken&user=$UserID&pretty=1")
 
-	$email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
+        $email = (((invoke-webrequest $url -UseBasicParsing).content | ConvertFrom-Json).user.profile | Select-Object -ExpandProperty email)
 
         write-output $email
- 	
-	# write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup | Select-Object UserPrincipalName, SignInName)
+
+        # write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup | Select-Object UserPrincipalName, SignInName)
         # write-output (Get-AzureRmADGroupMember -GroupObjectId $secGroup).SignInName
 
         # This is looking for guest users in AzureAD if the Email has _ or # it will not work
 
         # $accounts = (Get-AzureRmADGroupMember -GroupObjectId $secGroup).userPrincipalName | ForEach-Object { if ($_ -match "#"){($_ -split "#")[0] -replace "_","@" }else{$_}}
         $accounts = (Get-AzureRmADGroupMember -GroupObjectId $secGroup).SignInName
-        Write-Output $accounts
-        
+        # Write-Output $accounts
+
         if ($accounts -contains $email){
 
             "YAY Continue"
+            $Access = $true
 
-            Send-SlackMessage -Message ($UserName)
-
-            Send-SlackMessage -Message ($email)
+            Send-SlackMessage -Message ("Welcome $UserName")
 
         }else{
 
+            "Your not in the group"
+            $Access = $false
             Send-SlackMessage -Message "Your not in the group"
 
-            "Your not in the group"
-
-            write-output $accounts
+            # write-output $accounts
 
         }
 
@@ -411,7 +479,7 @@ if ($SlackParams.Text -eq 'testuser') {
 
 ###     /runbook delarmgroup ArtofShell-Network
 
-if ($SlackParams.Text -like 'delarmgroup*') {
+if (($SlackParams.Text -like 'delarmgroup*') -and ($Access -eq $true)) {
 
 	try {
 
