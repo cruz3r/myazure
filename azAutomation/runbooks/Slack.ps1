@@ -479,7 +479,7 @@ if ($SlackParams.Text -eq 'testuser') {
 
 ###     /runbook delarmgroup ArtofShell-Network
 
-if (($SlackParams.Text -like 'delarmgroup*') -and ($Access -eq $true)) {
+if (($SlackParams.Text -like 'delarmgroup*') -and ($Access)) {
 
 	try {
 
@@ -517,7 +517,7 @@ if (($SlackParams.Text -like 'delarmgroup*') -and ($Access -eq $true)) {
 
 ###     /runbook newarmgroup CloudAcademyRG WestEurope
 
-if ($SlackParams.Text -like 'newarmgroup*') {
+if (($SlackParams.Text -like 'newarmgroup*') -and ($Access)) {
 
 	try {
 
