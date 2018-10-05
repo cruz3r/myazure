@@ -435,20 +435,17 @@ if ($SlackParams.Text -eq 'testuser') {
             "YAY Continue"
             $Access = $true
 
-            Send-SlackMessage -Message ("Welcome $UserName")
+            Send-SlackMessage -Message ("$UserName has access")
 
         }else{
 
             "Your not in the group"
             $Access = $false
-            Send-SlackMessage -Message "Your not in the group"
+            Send-SlackMessage -Message "$UserName does not have access"
 
             # write-output $accounts
 
         }
-
-
-
     }
 
     catch{
